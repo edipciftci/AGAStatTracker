@@ -2,7 +2,7 @@ package org.agabsk.statorganizer;
 
 public class Event {
     private int playerNum, clockSeconds;
-    private String clock, eventType, playerName, eventID;
+    private String clock, eventType, playerName, eventID, success;
 
     public Event(String ID){
         this.playerNum = -1;
@@ -43,10 +43,8 @@ public class Event {
     public void setClock(String clock){
         this.clock = clock;
 
-        // Remove "PT" and split the remaining part at "M" and "S"
         String[] parts = clock.substring(2).split("[MS]");
-        
-        // Extract minutes and seconds
+
         int minutes = Integer.parseInt(parts[0]);
         int seconds = Integer.parseInt(parts[1]);
         
@@ -62,9 +60,12 @@ public class Event {
         return this.clockSeconds;
     }
 
-    @Override
-    public String toString(){
-        String eventString = "";
-        return eventString;
+    public void setSuccess(String success){
+        this.success = success;
     }
+
+    public String getSuccess(){
+        return this.success;
+    }
+
 }

@@ -9,7 +9,7 @@ public class Game {
     private final JsonArray[] Quarters = new JsonArray[8];
     private String homeTeam, awayTeam, gameName;
     private final ArrayList<Event> events = new ArrayList<>();
-    private ArrayList<String> singularEvents = new ArrayList<>();
+    private final ArrayList<Player> players = new ArrayList<>();
 
     public JsonArray[] getQuarters(){
         return this.Quarters;
@@ -68,17 +68,26 @@ public class Game {
         newEvent.setClock(event.get("clock").getAsString());
         newEvent.setPlayerNum(event.get("bib").getAsInt());
         newEvent.setPlayerName(event.get("name").getAsString());
+        if (event.get("eventType").getAsString().matches("2pt|3pt|freeThrow")){
+            newEvent.setSuccess(event.get("success").getAsString());
+        }
         this.events.add(newEvent);
-        for (String singEv : this.singularEvents) {
-            if (singEv.contentEquals(newEvent.getEventType())){
-                return;
+
+        boolean newPlayer = true;
+        for (Player player : this.players){
+            if (player.getPlayerID().equals(event.get("personId").getAsString())){
+                player.updateStat(newEvent);
+                newPlayer = true;
+                break;
             }
         }
-        this.singularEvents.add(newEvent.getEventType());
-    }
-
-    public ArrayList<String> getSingularEvents() {
-        return this.singularEvents;
+        if (newPlayer){
+            Player player = new Player(event.get("personId").getAsString());
+            player.setPlayerName(event.get("name").getAsString());
+            player.setPlayerNum(event.get("bib").getAsInt());
+            player.updateStat(newEvent);
+            this.players.add(player);
+        }
     }
 
     public void setGameName(){
