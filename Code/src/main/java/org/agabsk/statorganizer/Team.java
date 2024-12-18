@@ -3,9 +3,9 @@ package org.agabsk.statorganizer;
 import java.util.ArrayList;
 
 public class Team {
-    private ArrayList<Player> roster;
-    private String teamName;
-    private ArrayList<Game> games;
+    private final ArrayList<Player> roster;
+    private final String teamName;
+    private final ArrayList<Game> games;
 
     public Team(String teamName){
         this.roster = new ArrayList<>();
@@ -48,6 +48,10 @@ public class Team {
         String errString = this.teamName.concat(" never played against ").concat(Opp.getTeamName());
         System.out.println(errString);
         return null;
+    }
+
+    public void addPlayer(Player player){
+        this.roster.add(player);
     }
 
 }

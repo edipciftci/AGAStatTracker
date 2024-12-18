@@ -2,7 +2,8 @@ package org.agabsk.statorganizer;
 
 public class Event {
     private int playerNum, clockSeconds;
-    private String clock, eventType, playerName, eventID, success;
+    private String clock, eventType, playerName, success;
+    private final String eventID;
 
     public Event(String ID){
         this.playerNum = -1;

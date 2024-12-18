@@ -4,10 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Player {
-    private String playerName, playerID;
+    private String playerName;
+    private final String playerID;
     private int playerNum;
-    private Map<String, Integer> playerStats = new HashMap<>();
-    private Map<String, Double> percentages = new HashMap<>();
+    private final Map<String, Integer> playerStats = new HashMap<>();
+    private final Map<String, Double> percentages = new HashMap<>();
     private Team team;
 
     public Player(String ID) {

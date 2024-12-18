@@ -1,6 +1,7 @@
 package org.agabsk.statorganizer;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 public class Code {
     public static void main(String[] args) {
@@ -20,9 +22,11 @@ public class Code {
         System.out.println(game.getGameName());
     }
 
-    public static ArrayList<Player> getPlayers(String playerListUrlString, ArrayList<Player> playerPool){
+    @SuppressWarnings("CallToPrintStackTrace")
+    public static ArrayList<Player>[] getPlayers(String playerListUrlString, ArrayList<Player> playerPool){
 
-        ArrayList<Player> players = new ArrayList<>();
+        ArrayList<Player> homePlayerList = new ArrayList<>();
+        ArrayList<Player> awayPlayerList = new ArrayList<>();
 
         try {
             
@@ -62,7 +66,7 @@ public class Code {
                 String ID = awayPlayers.get(i).getAsJsonObject().get("personId").getAsString();
                 for (Player player : playerPool) {
                     if (player.getPlayerID().equals(ID)){
-                        players.add(player);
+                        awayPlayerList.add(player);
                         newPlayerCheck = false;
                         break;
                     }
@@ -72,7 +76,7 @@ public class Code {
                     newPlayer.setPlayerName(awayPlayers.get(i).getAsJsonObject().get("personName").getAsString());
                     newPlayer.setPlayerNum(awayPlayers.get(i).getAsJsonObject().get("bib").getAsInt());
                     playerPool.add(newPlayer);
-                    players.add(newPlayer);
+                    awayPlayerList.add(newPlayer);
                 }
             }
 
@@ -81,7 +85,7 @@ public class Code {
                 String ID = homePlayers.get(i).getAsJsonObject().get("personId").getAsString();
                 for (Player player : playerPool) {
                     if (player.getPlayerID().equals(ID)){
-                        players.add(player);
+                        homePlayerList.add(player);
                         newPlayerCheck = false;
                         break;
                     }
@@ -91,21 +95,25 @@ public class Code {
                     newPlayer.setPlayerName(homePlayers.get(i).getAsJsonObject().get("personName").getAsString());
                     newPlayer.setPlayerNum(homePlayers.get(i).getAsJsonObject().get("bib").getAsInt());
                     playerPool.add(newPlayer);
-                    players.add(newPlayer);
+                    homePlayerList.add(newPlayer);
                 }
             }
 
-        }   catch (Exception e) {
+        }   catch (JsonSyntaxException | IOException e) {
             e.printStackTrace();
             return null;
         }
-        return players;
+        ArrayList<Player>[] playerTuple = new ArrayList[2];
+        playerTuple[0] = homePlayerList;
+        playerTuple[1] = awayPlayerList;
+        return playerTuple;
     }
     
+    @SuppressWarnings("CallToPrintStackTrace")
     public static Game newGame(String gameUrlString, String playerListUrlString, ArrayList<Player> playerPool, ArrayList<Team> teamPool){
         try {
             
-            ArrayList<Player> players = getPlayers(playerListUrlString, playerPool);
+            ArrayList<Player>[] players = getPlayers(playerListUrlString, playerPool);
 
             @SuppressWarnings("deprecation")
             URL gameURL = new URL(gameUrlString);
@@ -183,7 +191,7 @@ public class Code {
 
             return game;
 
-        } catch (Exception e) {
+        } catch (JsonSyntaxException | IOException | NumberFormatException e) {
             e.printStackTrace();
             return null;
         }

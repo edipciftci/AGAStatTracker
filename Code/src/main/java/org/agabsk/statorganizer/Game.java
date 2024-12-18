@@ -9,11 +9,17 @@ public class Game {
     private final JsonArray[] Quarters = new JsonArray[8];
     private String gameName;
     private final ArrayList<Event> events = new ArrayList<>();
+    private ArrayList<Player> homePlayers = new ArrayList<>();
+    private ArrayList<Player> awayPlayers = new ArrayList<>();
     private ArrayList<Player> players = new ArrayList<>();
     private Team homeTeam, awayTeam;
     
-    public Game(ArrayList<Player> players){
-        this.players = players;
+    public Game(ArrayList<Player>[] players){
+        this.homePlayers = players[0];
+        this.awayPlayers = players[1];
+
+        this.players.addAll(this.homePlayers);
+
     }
 
     public JsonArray[] getQuarters(){
@@ -40,10 +46,22 @@ public class Game {
 
     public void setHomeTeam(Team homeTeam){
         this.homeTeam = homeTeam;
+        for (Player player : this.homePlayers) {
+            if (this.homeTeam.getPlayerByID(player.getPlayerID()) == null){
+                this.homeTeam.addPlayer(player);
+                System.out.println("Player ".concat(player.getPlayerName()).concat(" is added to the ").concat(homeTeam.getTeamName()));
+            }
+        }
     }
 
     public void setAwayTeam(Team awayTeam){
         this.awayTeam = awayTeam;
+        for (Player player : this.awayPlayers) {
+            if (this.awayTeam.getPlayerByID(player.getPlayerID()) == null){
+                this.awayTeam.addPlayer(player);
+                System.out.println("Player ".concat(player.getPlayerName()).concat(" is added to the ").concat(awayTeam.getTeamName()));
+            }
+        }
     }
 
     public Team getHomeTeam(){
@@ -78,21 +96,13 @@ public class Game {
         }
         this.events.add(newEvent);
 
-        boolean newPlayer = true;
         for (Player player : this.players){
             if (player.getPlayerID().equals(event.get("personId").getAsString())){
                 player.updateStat(newEvent);
-                newPlayer = false;
                 break;
             }
         }
-        if (newPlayer){
-            Player player = new Player(event.get("personId").getAsString());
-            player.setPlayerName(event.get("name").getAsString());
-            player.setPlayerNum(event.get("bib").getAsInt());
-            player.updateStat(newEvent);
-            this.players.add(player);
-        }
+
     }
 
     public void setGameName(){
@@ -102,4 +112,5 @@ public class Game {
     public String getGameName(){
         return this.gameName;
     }
+
 }
