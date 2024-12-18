@@ -9,7 +9,11 @@ public class Game {
     private final JsonArray[] Quarters = new JsonArray[8];
     private String homeTeam, awayTeam, gameName;
     private final ArrayList<Event> events = new ArrayList<>();
-    private final ArrayList<Player> players = new ArrayList<>();
+    private ArrayList<Player> players = new ArrayList<>();
+    
+    public Game(ArrayList<Player> players){
+        this.players = players;
+    }
 
     public JsonArray[] getQuarters(){
         return this.Quarters;
@@ -77,7 +81,7 @@ public class Game {
         for (Player player : this.players){
             if (player.getPlayerID().equals(event.get("personId").getAsString())){
                 player.updateStat(newEvent);
-                newPlayer = true;
+                newPlayer = false;
                 break;
             }
         }
