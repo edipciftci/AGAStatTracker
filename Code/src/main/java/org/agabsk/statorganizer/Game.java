@@ -7,9 +7,10 @@ import com.google.gson.JsonObject;
 
 public class Game {
     private final JsonArray[] Quarters = new JsonArray[8];
-    private String homeTeam, awayTeam, gameName;
+    private String gameName;
     private final ArrayList<Event> events = new ArrayList<>();
     private ArrayList<Player> players = new ArrayList<>();
+    private Team homeTeam, awayTeam;
     
     public Game(ArrayList<Player> players){
         this.players = players;
@@ -37,19 +38,19 @@ public class Game {
         return this.Quarters[qtrKey-7];
     }
 
-    public void setHomeTeam(String homeTeam){
+    public void setHomeTeam(Team homeTeam){
         this.homeTeam = homeTeam;
     }
 
-    public void setAwayTeam(String awayTeam){
+    public void setAwayTeam(Team awayTeam){
         this.awayTeam = awayTeam;
     }
 
-    public String getHomeTeam(){
+    public Team getHomeTeam(){
         return this.homeTeam;
     }
 
-    public String getAwayTeam(){
+    public Team getAwayTeam(){
         return this.awayTeam;
     }
 
@@ -95,7 +96,7 @@ public class Game {
     }
 
     public void setGameName(){
-        this.gameName = this.homeTeam.concat("_").concat(this.awayTeam).replace(" ", "");
+        this.gameName = this.homeTeam.getTeamName().concat("_").concat(this.awayTeam.getTeamName()).replace(" ", "");
     }
 
     public String getGameName(){

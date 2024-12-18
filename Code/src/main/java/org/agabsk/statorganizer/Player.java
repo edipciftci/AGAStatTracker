@@ -8,10 +8,19 @@ public class Player {
     private int playerNum;
     private Map<String, Integer> playerStats = new HashMap<>();
     private Map<String, Double> percentages = new HashMap<>();
+    private Team team;
 
     public Player(String ID) {
         this.playerID = ID;
         this.initializeStats();
+    }
+
+    public void setTeam(Team team){
+        this.team = team;
+    }
+
+    public Team getTeam(){
+        return this.team;
     }
 
     private void initializeStats() {
@@ -104,7 +113,7 @@ public class Player {
     }
 
     public void substitution(String subType){
-
+        // TODO
     }
 
     public int getStat(String key) {

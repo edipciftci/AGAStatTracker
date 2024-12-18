@@ -13,9 +13,11 @@ import com.google.gson.JsonParser;
 public class Code {
     public static void main(String[] args) {
         ArrayList<Player> playerPool = new ArrayList<>();
+        ArrayList<Team> teamPool = new ArrayList<>();
         String urlString = "https://eapi.web.prod.cloud.atriumsports.com/v1/embed/106/fixture_detail?state=eJwtjDEKwzAMAL8SNFcQyXZs9xklH5CiaMpgkk4t_XsQdLuD475wwXMC1lKrbY6Ll4xEu6NwT6gpCYtXK1TgMcER8fvE9RX2CRs6gj24unU2E2xzn_8b2hY00l2bm-TO8LsBt78d8g";
         String playerListURLString = "https://eapi.web.prod.cloud.atriumsports.com/v1/embed/106/fixture_detail?state=eJwtjEEKhDAMAL8iOW_ApNbafYb4gbQxIHja9rTi3yXgcYZhLmjwHYBLTEmr4WxxQqLdUDgHLCEIiyWNFOEzwOlx_-G2Ov2dWpd-tH7U5spcJdPMqoLLmMf3RnVGpbKXxVSmzHA_zb0g-w";
-        Game game = newGame(urlString, playerListURLString, playerPool);
+        Game game = newGame(urlString, playerListURLString, playerPool, teamPool);
+        System.out.println(game.getGameName());
     }
 
     public static ArrayList<Player> getPlayers(String playerListUrlString, ArrayList<Player> playerPool){
@@ -100,7 +102,7 @@ public class Code {
         return players;
     }
     
-    public static Game newGame(String gameUrlString, String playerListUrlString, ArrayList<Player> playerPool){
+    public static Game newGame(String gameUrlString, String playerListUrlString, ArrayList<Player> playerPool, ArrayList<Team> teamPool){
         try {
             
             ArrayList<Player> players = getPlayers(playerListUrlString, playerPool);
@@ -134,10 +136,39 @@ public class Code {
             Game game = new Game(players);
 
             JsonObject homeJSON = (JsonObject) gameJson.getAsJsonObject("banner").getAsJsonObject("fixture").getAsJsonArray("competitors").get(0).getAsJsonObject();
-            game.setHomeTeam(homeJSON.get("name").getAsString());
-
             JsonObject awayJSON = (JsonObject) gameJson.getAsJsonObject("banner").getAsJsonObject("fixture").getAsJsonArray("competitors").get(1).getAsJsonObject();
-            game.setAwayTeam(awayJSON.get("name").getAsString());
+
+            boolean homeBool = true;
+            boolean awayBool = true;
+
+            for (Team team : teamPool) {
+                if (team.getTeamName().matches(homeJSON.get("name").getAsString())){
+                    homeBool = false;
+                    game.setHomeTeam(team);
+                    Team homeTeam = team;
+                    homeTeam.addGame(game);
+                    continue;
+                }
+                if (team.getTeamName().matches(awayJSON.get("name").getAsString())){
+                    awayBool = false;
+                    game.setHomeTeam(team);
+                    Team awayTeam = team;
+                    awayTeam.addGame(game);
+                }
+            }
+
+            if (homeBool){
+                Team homeTeam = new Team(homeJSON.get("name").getAsString());
+                game.setHomeTeam(homeTeam);
+                homeTeam.addGame(game);
+                teamPool.add(homeTeam);
+            }
+            if (awayBool){
+                Team awayTeam = new Team(awayJSON.get("name").getAsString());
+                game.setAwayTeam(awayTeam);
+                awayTeam.addGame(game);
+                teamPool.add(awayTeam);
+            }
 
             game.setGameName();
 
@@ -150,7 +181,6 @@ public class Code {
                 game.setQtr(pbp.getAsJsonObject(key).getAsJsonArray("events"), Integer.parseInt(key));
             }
 
-            System.out.println(game.getGameName());
             return game;
 
         } catch (Exception e) {
