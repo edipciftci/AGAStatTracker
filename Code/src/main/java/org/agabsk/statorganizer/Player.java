@@ -7,6 +7,7 @@ public class Player {
     private String playerName, playerID;
     private int playerNum;
     private Map<String, Integer> playerStats = new HashMap<>();
+    private Map<String, Double> percentages = new HashMap<>();
 
     public Player(String ID) {
         this.playerID = ID;
@@ -16,13 +17,13 @@ public class Player {
     private void initializeStats() {
         this.playerStats.put("2pt-Attempted", 0);
         this.playerStats.put("2pt-Made", 0);
-        this.playerStats.put("2pt-Percentage", 0);
+        this.percentages.put("2pt-Percentage", 0.00);
         this.playerStats.put("3pt-Attempted", 0);
         this.playerStats.put("3pt-Made", 0);
-        this.playerStats.put("3pt-Percentage", 0);
+        this.percentages.put("3pt-Percentage", 0.00);
         this.playerStats.put("FT-Attempted", 0);
         this.playerStats.put("FT-Made", 0);
-        this.playerStats.put("FT-Percentage", 0);
+        this.percentages.put("FT-Percentage", 0.00);
         this.playerStats.put("Points", 0);
         this.playerStats.put("Assists", 0);
         this.playerStats.put("OffReb", 0);
@@ -81,8 +82,8 @@ public class Player {
     private void updatePercentage(String madeKey, String attemptedKey, String percentageKey) {
         int made = this.playerStats.get(madeKey);
         int attempted = this.playerStats.get(attemptedKey);
-        int percentage = attempted > 0 ? (int) ((made / (double) attempted) * 100) : 0;
-        this.playerStats.put(percentageKey, percentage);
+        double percentage = attempted > 0 ? (double) ((made / (double) attempted) * 100) : 0;
+        this.percentages.put(percentageKey, percentage);
     }
 
     private void rebound(String rebType){
@@ -94,7 +95,15 @@ public class Player {
         this.playerStats.put("RebTotal", this.playerStats.get("RebTotal") + 1);
     }
 
-    private void foul(){
+    private void foul(String foulType){
+        if ("drawn".equals(foulType)){
+            this.playerStats.put("Fouls-Drawn", this.playerStats.get("Fouls-Drawn") + 1);
+        } else{
+            this.playerStats.put("Fouls", this.playerStats.get("Fouls") + 1);
+        }
+    }
+
+    public void substitution(String subType){
 
     }
 
@@ -111,11 +120,9 @@ public class Player {
             case "rebound" -> this.rebound(event.getEventType().split("-")[1]);
             case "steal" -> this.playerStats.put("Steal", this.playerStats.get("Steal")+1);
             case "turnover" -> this.playerStats.put("TO", this.playerStats.get("TO")+1);
-            case "foul-personal" -> this.foul();
-            case "foul-unsportsmanlike" -> this.foul();
-            case "foul-offensive" -> this.foul();
-            case "foul-drawn" -> this.foul();
+            case "foul" -> this.foul(event.getEventType().split("-")[1]);
             case "block" -> this.playerStats.put("Block", this.playerStats.get("Block")+1);
+            case "substitution" -> this.substitution(event.getEventType().split("-")[1]);
         
             default -> System.out.println(event.getEventType());
         }
