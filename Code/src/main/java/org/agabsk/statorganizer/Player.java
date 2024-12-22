@@ -1,5 +1,6 @@
 package org.agabsk.statorganizer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,20 +11,36 @@ public class Player {
     private final Map<String, Integer> playerStats = new HashMap<>();
     private final Map<String, Double> percentages = new HashMap<>();
     private Team team;
+    private ArrayList<Game> games = new ArrayList<>();
 
+    /**
+     * Constructor to initialize player with ID and stats.
+     * @param ID the unique identifier for the player
+     */
     public Player(String ID) {
         this.playerID = ID;
         this.initializeStats();
     }
 
+    /**
+     * Set the team for the player.
+     * @param team the team to set
+     */
     public void setTeam(Team team){
         this.team = team;
     }
 
+    /**
+     * Get the team of the player.
+     * @return the team of the player
+     */
     public Team getTeam(){
         return this.team;
     }
 
+    /**
+     * Initialize player statistics.
+     */
     private void initializeStats() {
         this.playerStats.put("2pt-Attempted", 0);
         this.playerStats.put("2pt-Made", 0);
@@ -46,22 +63,42 @@ public class Player {
         this.playerStats.put("RebTotal", 0);
     }
 
+    /**
+     * Set the player's name.
+     * @param playerName the name to set
+     */
     public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
 
+    /**
+     * Get the player's name.
+     * @return the player's name
+     */
     public String getPlayerName() {
         return this.playerName;
     }
 
+    /**
+     * Set the player's number.
+     * @param playerNum the number to set
+     */
     public void setPlayerNum(int playerNum) {
         this.playerNum = playerNum;
     }
 
+    /**
+     * Get the player's number.
+     * @return the player's number
+     */
     public int getPlayerNum() {
         return this.playerNum;
     }
 
+    /**
+     * Update stats for a 2-point attempt.
+     * @param success indicates if the attempt was successful ("true" or "false")
+     */
     public void twoPTAttempt(String success) {
         if ("true".equals(success)) {
             this.playerStats.put("2pt-Made", this.playerStats.get("2pt-Made") + 1);
@@ -71,6 +108,10 @@ public class Player {
         updatePercentage("2pt-Made", "2pt-Attempted", "2pt-Percentage");
     }
 
+    /**
+     * Update stats for a 3-point attempt.
+     * @param success indicates if the attempt was successful ("true" or "false")
+     */
     public void threePTAttempt(String success) {
         if ("true".equals(success)) {
             this.playerStats.put("3pt-Made", this.playerStats.get("3pt-Made") + 1);
@@ -80,6 +121,10 @@ public class Player {
         updatePercentage("3pt-Made", "3pt-Attempted", "3pt-Percentage");
     }
 
+    /**
+     * Update stats for a free throw attempt.
+     * @param success indicates if the attempt was successful ("true" or "false")
+     */
     public void FTAttempt(String success) {
         if ("true".equals(success)) {
             this.playerStats.put("FT-Made", this.playerStats.get("FT-Made") + 1);
@@ -89,6 +134,12 @@ public class Player {
         updatePercentage("FT-Made", "FT-Attempted", "FT-Percentage");
     }
 
+    /**
+     * Update shooting percentage.
+     * @param madeKey the key for made shots
+     * @param attemptedKey the key for attempted shots
+     * @param percentageKey the key for the percentage
+     */
     private void updatePercentage(String madeKey, String attemptedKey, String percentageKey) {
         int made = this.playerStats.get(madeKey);
         int attempted = this.playerStats.get(attemptedKey);
@@ -96,6 +147,10 @@ public class Player {
         this.percentages.put(percentageKey, percentage);
     }
 
+    /**
+     * Update stats for a rebound.
+     * @param rebType the type of rebound ("offensive" or "defensive")
+     */
     private void rebound(String rebType){
         if ("offensive".equals(rebType)){
             this.playerStats.put("OffReb", this.playerStats.get("OffReb") + 1);
@@ -105,6 +160,10 @@ public class Player {
         this.playerStats.put("RebTotal", this.playerStats.get("RebTotal") + 1);
     }
 
+    /**
+     * Update stats for a foul.
+     * @param foulType the type of foul ("drawn" or other)
+     */
     private void foul(String foulType){
         if ("drawn".equals(foulType)){
             this.playerStats.put("Fouls-Drawn", this.playerStats.get("Fouls-Drawn") + 1);
@@ -113,14 +172,36 @@ public class Player {
         }
     }
 
+    /**
+     * Placeholder for substitution logic.
+     * @param subType the type of substitution
+     */
     public void substitution(String subType){
         // TODO
     }
 
+    /**
+     * Get a specific stat by key.
+     * @param key the key for the stat
+     * @return the value of the stat
+     */
     public int getStat(String key) {
         return this.playerStats.getOrDefault(key, 0);
     }
 
+    /**
+     * Get average of a specific stat by key.
+     * @param key the key for the stat
+     * @return the average value of the stat
+     */
+    public double getAverageStat(String key) {
+        return this.getAverages().get(key);
+    }
+
+    /**
+     * Update player stats based on an event.
+     * @param event the event to update stats from
+     */
     public void updateStat(Event event){
         switch (event.getEventType().split("-")[0]) {
             case "2pt" -> this.twoPTAttempt(event.getSuccess());
@@ -138,7 +219,62 @@ public class Player {
         }
     }
 
+    /**
+     * Get the player's ID.
+     * @return the player's ID
+     */
     public String getPlayerID(){
         return this.playerID;
     }
+
+    /**
+     * Add a game to the player's game list.
+     * @param game the game to add
+     */
+    public void addGame(Game game){
+        this.games.add(game);
+    }
+
+    /**
+     * Get the list of games the player has played.
+     * @return the list of games
+     */
+    public ArrayList<Game> getGames(){
+        return this.games;
+    }
+
+    /**
+     * Get a specific game against an opponent team.
+     * @param Opp the opponent team
+     * @return the game against the opponent team, or null if not found
+     */
+    public Game getGame(Team Opp){
+        for (Game game : this.games) {
+            if ((Opp == game.getAwayTeam()) || (Opp == game.getHomeTeam())){
+                return game;
+            }
+        }
+        System.out.println("Player hasn't played a game against ".concat(Opp.getTeamName()));
+        return null;
+    }
+
+    /**
+     * Calculate and return average stats.
+     * @return a map of average stats
+     */
+    public Map<String, Double> getAverages(){
+        int divider = this.games.size();
+        if (this.games.size() == 0){
+            divider = 0;
+        }
+        Map<String, Double> averages = new HashMap<>();
+        Double ave;
+        for (String key : this.playerStats.keySet()) {
+            ave = (double) (this.playerStats.get(key) / (double)divider);
+            averages.put(key, ave);
+        }
+        averages.putAll(this.percentages);
+        return averages;
+    }
+
 }
