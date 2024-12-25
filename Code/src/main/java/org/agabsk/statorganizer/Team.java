@@ -96,6 +96,22 @@ public class Team {
 
     public void setCurrentOnCourt(onCourt curr){
         this.currentOnCourt = curr;
+        if (!this.checkOnCourt(curr)){
+            this.onCourts.add(curr);
+        }
+    }
+
+    public onCourt getCurrentOnCourt(){
+        return this.currentOnCourt;
+    }
+
+    public boolean checkOnCourt(onCourt currOnCourt){
+        for (onCourt temp : this.onCourts) {
+            if (temp == currOnCourt){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
