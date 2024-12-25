@@ -6,6 +6,8 @@ public class Team {
     private final ArrayList<Player> roster;
     private final String teamName;
     private final ArrayList<Game> games;
+    private final ArrayList<onCourt> onCourts;
+    private onCourt currentOnCourt;
 
     /**
      * Constructor to initialize team with name.
@@ -15,6 +17,7 @@ public class Team {
         this.roster = new ArrayList<>();
         this.teamName = teamName;
         this.games = new ArrayList<>();
+        this.onCourts = new ArrayList<>();
     }
 
     /**
@@ -85,6 +88,14 @@ public class Team {
      */
     public void addPlayer(Player player){
         this.roster.add(player);
+    }
+
+    public void addOnCourt(onCourt newOnCourt){
+        this.onCourts.add(newOnCourt);
+    }
+
+    public void setCurrentOnCourt(onCourt curr){
+        this.currentOnCourt = curr;
     }
 
 }

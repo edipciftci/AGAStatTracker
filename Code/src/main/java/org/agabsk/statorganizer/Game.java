@@ -71,7 +71,6 @@ public class Game {
         for (Player player : this.homePlayers) {
             if (this.homeTeam.getPlayerByID(player.getPlayerID()) == null){
                 this.homeTeam.addPlayer(player);
-                // System.out.println("Player ".concat(player.getPlayerName()).concat(" is added to the ").concat(homeTeam.getTeamName()));
             }
             player.addGame(this);
         }
@@ -86,7 +85,6 @@ public class Game {
         for (Player player : this.awayPlayers) {
             if (this.awayTeam.getPlayerByID(player.getPlayerID()) == null){
                 this.awayTeam.addPlayer(player);
-                // System.out.println("Player ".concat(player.getPlayerName()).concat(" is added to the ").concat(awayTeam.getTeamName()));
             }
             player.addGame(this);
         }

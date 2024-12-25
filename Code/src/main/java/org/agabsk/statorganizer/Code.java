@@ -108,6 +108,11 @@ public class Code {
         ArrayList<Player> homePlayerList = new ArrayList<>();
         ArrayList<Player> awayPlayerList = new ArrayList<>();
 
+        ArrayList<Player> homeFive = new ArrayList<>();
+        ArrayList<Player> awayFive = new ArrayList<>();
+
+        onCourt homeOnCourt, awayOnCourt;
+
         String gameFlowURL = null;
 
         try {
@@ -151,10 +156,14 @@ public class Code {
             for (int i = 0 ; i < awayPlayers.size() ; i++){
                 boolean newPlayerCheck = true;
                 String ID = awayPlayers.get(i).getAsJsonObject().get("personId").getAsString();
+                String starter = awayPlayers.get(i).getAsJsonObject().get("starter").getAsString();
                 for (Player player : playerPool) {
                     if (player.getPlayerID().equals(ID)){
                         awayPlayerList.add(player);
                         newPlayerCheck = false;
+                        if (starter.equals("true")){
+                            awayFive.add(player);
+                        }
                         break;
                     }
                 }
@@ -164,17 +173,26 @@ public class Code {
                     newPlayer.setPlayerNum(awayPlayers.get(i).getAsJsonObject().get("bib").getAsInt());
                     playerPool.add(newPlayer);
                     awayPlayerList.add(newPlayer);
+                    if (starter.equals("true")){
+                        awayFive.add(newPlayer);
+                    }
                 }
             }
+
+            awayOnCourt = awayFive.get(0).checkOnCourt(awayFive);
 
             // Process home players
             for (int i = 0 ; i < homePlayers.size() ; i++){
                 boolean newPlayerCheck = true;
                 String ID = homePlayers.get(i).getAsJsonObject().get("personId").getAsString();
+                String starter = homePlayers.get(i).getAsJsonObject().get("starter").getAsString();
                 for (Player player : playerPool) {
                     if (player.getPlayerID().equals(ID)){
                         homePlayerList.add(player);
                         newPlayerCheck = false;
+                        if (starter.equals("true")){
+                            homeFive.add(player);
+                        }
                         break;
                     }
                 }
@@ -184,8 +202,13 @@ public class Code {
                     newPlayer.setPlayerNum(homePlayers.get(i).getAsJsonObject().get("bib").getAsInt());
                     playerPool.add(newPlayer);
                     homePlayerList.add(newPlayer);
+                    if (starter.equals("true")){
+                        homeFive.add(newPlayer);
+                    }
                 }
             }
+
+            homeOnCourt = homeFive.get(0).checkOnCourt(homeFive);
 
         }   catch (JsonSyntaxException | IOException e) {
             e.printStackTrace();
@@ -196,8 +219,12 @@ public class Code {
         playerTuple[0] = homePlayerList;
         playerTuple[1] = awayPlayerList;
 
+        onCourt[] onCourtTuple = new onCourt[2];
+        onCourtTuple[0] = homeOnCourt;
+        onCourtTuple[1] = awayOnCourt;
+
         // Create a new game with the player lists and team pool
-        Game game = newGame(gameFlowURL, playerTuple, teamPool);
+        Game game = newGame(gameFlowURL, playerTuple, teamPool, onCourtTuple);
         return game;
     }
     
@@ -209,7 +236,7 @@ public class Code {
      * @return the game object
      */
     @SuppressWarnings("CallToPrintStackTrace")
-    public static Game newGame(String gameUrlString, ArrayList<Player>[] players, ArrayList<Team> teamPool){
+    public static Game newGame(String gameUrlString, ArrayList<Player>[] players, ArrayList<Team> teamPool, onCourt[] startingFives){
         try {
 
             // Fetch game data from the URL
@@ -281,6 +308,8 @@ public class Code {
             }
 
             game.setGameName();
+            game.getHomeTeam().setCurrentOnCourt(startingFives[0]);
+            game.getAwayTeam().setCurrentOnCourt(startingFives[1]);
 
             // Set events for each quarter
             String[] qtrKeys = {"1", "2", "3", "4", "11", "12", "13", "14"};

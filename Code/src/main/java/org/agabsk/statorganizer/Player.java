@@ -10,8 +10,10 @@ public class Player {
     private int playerNum;
     private final Map<String, Integer> playerStats = new HashMap<>();
     private final Map<String, Double> percentages = new HashMap<>();
+    private String playTime;
     private Team team;
     private ArrayList<Game> games = new ArrayList<>();
+    private ArrayList<onCourt> onCourts = new ArrayList<>();
 
     /**
      * Constructor to initialize player with ID and stats.
@@ -20,6 +22,7 @@ public class Player {
     public Player(String ID) {
         this.playerID = ID;
         this.initializeStats();
+        this.playTime = "00:00:00";
     }
 
     /**
@@ -195,7 +198,12 @@ public class Player {
      * @return the average value of the stat
      */
     public double getAverageStat(String key) {
-        return this.getAverages().get(key);
+        int divider = this.games.size();
+        if (this.games.isEmpty()){
+            divider = 1;
+        }
+
+        return (double) (this.playerStats.get(key) / (double)divider);
     }
 
     /**
@@ -264,17 +272,35 @@ public class Player {
      */
     public Map<String, Double> getAverages(){
         int divider = this.games.size();
-        if (this.games.size() == 0){
-            divider = 0;
+        if (this.games.isEmpty()){
+            divider = 1;
         }
         Map<String, Double> averages = new HashMap<>();
         Double ave;
         for (String key : this.playerStats.keySet()) {
             ave = (double) (this.playerStats.get(key) / (double)divider);
+            ave = (double) Math.round((ave*100)/100);
             averages.put(key, ave);
         }
         averages.putAll(this.percentages);
         return averages;
+    }
+
+    public void addOnCourt(onCourt newOnCourt){
+        this.onCourts.add(newOnCourt);
+    }
+
+    public onCourt checkOnCourt(ArrayList<Player> currentCourt){
+        for (onCourt Court : this.onCourts){
+            if (Court.checkByPlayers(currentCourt)){
+                return Court;
+            }
+        }
+        onCourt newCourt = new onCourt(this.team);
+        for (Player player : currentCourt) {
+            newCourt.addPlayer(player);
+        }
+        return newCourt;
     }
 
 }
