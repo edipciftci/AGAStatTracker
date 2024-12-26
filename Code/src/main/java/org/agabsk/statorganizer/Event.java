@@ -77,16 +77,17 @@ public class Event {
      * Set the clock time.
      * @param clock the clock time to set
      */
-    public void setClock(String clock){
+    public void setClock(String clock, int qtr){
         this.clock = clock;
 
         String[] parts = clock.substring(2).split("[MS]");
 
         int minutes = Integer.parseInt(parts[0]);
         int seconds = Integer.parseInt(parts[1]);
-        
-        this.clockSeconds = (60 * minutes) + seconds;
-        
+
+        int remaining = (60 * minutes) + seconds;
+        this.clockSeconds = 600 - remaining + ((qtr-1) * 600);
+
     }
 
     /**

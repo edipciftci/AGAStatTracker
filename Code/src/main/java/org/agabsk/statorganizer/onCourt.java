@@ -8,11 +8,12 @@ public class onCourt {
 
     private Team team;
     private Map<Player, Map<String, Double>> players = new HashMap<>();
-    private String playTime;
+    private int totalPlayTime, currentTimeInSeconds;
 
     public onCourt(Team team){
         this.team = team;
-        this.playTime = "00:00:00";
+        this.totalPlayTime = 0;
+        this.currentTimeInSeconds = 0;
     }
 
     public Team getTeam(){

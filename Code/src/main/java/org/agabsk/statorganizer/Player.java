@@ -10,7 +10,7 @@ public class Player {
     private int playerNum;
     private final Map<String, Integer> playerStats = new HashMap<>();
     private final Map<String, Double> percentages = new HashMap<>();
-    private String playTime;
+    private int totalPlayTime, currentPlayTimeInSeconds;
     private Team team;
     private ArrayList<Game> games = new ArrayList<>();
     private ArrayList<onCourt> onCourts = new ArrayList<>();
@@ -22,7 +22,8 @@ public class Player {
     public Player(String ID) {
         this.playerID = ID;
         this.initializeStats();
-        this.playTime = "00:00:00";
+        this.totalPlayTime = 0;
+        this.currentPlayTimeInSeconds = 0;
     }
 
     /**
@@ -179,11 +180,14 @@ public class Player {
      * Placeholder for substitution logic.
      * @param subType the type of substitution
      */
-    public void substitution(String subType){
+    public void substitution(String subType, int subTime){
         if (subType.equals("out")){
             this.team.subOut(this);
+            int duration = subTime - this.currentPlayTimeInSeconds;
+            this.totalPlayTime = this.totalPlayTime + duration;
         } else if(subType.equals("in")){
             this.team.subIn(this);
+            this.currentPlayTimeInSeconds = subTime;
         }
     }
 
@@ -225,7 +229,7 @@ public class Player {
             case "turnover" -> this.playerStats.put("TO", this.playerStats.get("TO")+1);
             case "foul" -> this.foul(event.getEventType().split("-")[1]);
             case "block" -> this.playerStats.put("Block", this.playerStats.get("Block")+1);
-            case "substitution" -> this.substitution(event.getEventType().split("-")[1]);
+            case "substitution" -> this.substitution(event.getEventType().split("-")[1], event.getClockInSeconds());
         
             default -> System.out.println(event.getEventType());
         }

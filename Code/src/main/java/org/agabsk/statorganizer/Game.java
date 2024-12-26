@@ -40,13 +40,15 @@ public class Game {
      * @param qtrKey the key for the quarter
      */
     public void setQtr(JsonArray events, int qtrKey){
+        int qtr;
         if (qtrKey < 5){
-            this.Quarters[qtrKey-1] = events;
+            qtr = qtrKey - 1;
         } else{
-            this.Quarters[qtrKey-7] = events;
+            qtr = qtrKey - 7;
         }
+        this.Quarters[qtr] = events;
         for (int i = 0; i < events.size(); i++) {
-            this.newEvent((JsonObject) events.get(i));
+            this.newEvent((JsonObject) events.get(i), qtr+1);
         }
     }
 
@@ -110,7 +112,7 @@ public class Game {
      * Add a new event to the game.
      * @param event the event to add
      */
-    public void newEvent(JsonObject event){
+    public void newEvent(JsonObject event, int quarter){
         // Check if the event has a player number (bib)
         if (event.get("bib") == null){
             return;
@@ -118,9 +120,6 @@ public class Game {
         // Ignore jump ball events
         if (event.get("eventType").getAsString().matches("jumpBall")){
             return;
-        }
-        if (event.get("eventType").getAsString().matches("substitution")){
-            System.out.println("here");
         }
         Event newEvent;
         try {
@@ -136,7 +135,7 @@ public class Game {
             newEvent.setEventType(event.get("eventType").getAsString());
         }
         // Set event details
-        newEvent.setClock(event.get("clock").getAsString());
+        newEvent.setClock(event.get("clock").getAsString(), quarter);
         newEvent.setPlayerNum(event.get("bib").getAsInt());
         newEvent.setPlayerName(event.get("name").getAsString());
         if (event.get("eventType").getAsString().matches("2pt|3pt|freeThrow")){
