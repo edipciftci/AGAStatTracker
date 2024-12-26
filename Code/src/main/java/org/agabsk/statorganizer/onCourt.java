@@ -84,4 +84,12 @@ public class onCourt {
         return true;
     }
 
+    public ArrayList<Player> getPlayers(){
+        ArrayList<Player> playerList = new ArrayList<>();
+        for (Player player : players.keySet()) {
+            playerList.add(player);
+        }
+        return playerList;
+    }
+
 }

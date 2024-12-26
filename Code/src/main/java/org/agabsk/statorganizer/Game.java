@@ -119,6 +119,9 @@ public class Game {
         if (event.get("eventType").getAsString().matches("jumpBall")){
             return;
         }
+        if (event.get("eventType").getAsString().matches("substitution")){
+            System.out.println("here");
+        }
         Event newEvent;
         try {
             // Handle specific event types with subtypes

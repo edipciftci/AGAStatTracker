@@ -180,7 +180,11 @@ public class Player {
      * @param subType the type of substitution
      */
     public void substitution(String subType){
-        // TODO
+        if (subType.equals("out")){
+            this.team.subOut(this);
+        } else if(subType.equals("in")){
+            this.team.subIn(this);
+        }
     }
 
     /**

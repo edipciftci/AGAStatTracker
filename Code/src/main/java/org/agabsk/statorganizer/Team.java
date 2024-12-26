@@ -8,6 +8,7 @@ public class Team {
     private final ArrayList<Game> games;
     private final ArrayList<onCourt> onCourts;
     private onCourt currentOnCourt;
+    private ArrayList<Player> currOnCrtPlayers;
 
     /**
      * Constructor to initialize team with name.
@@ -88,10 +89,9 @@ public class Team {
      */
     public void addPlayer(Player player){
         this.roster.add(player);
-    }
-
-    public void addOnCourt(onCourt newOnCourt){
-        this.onCourts.add(newOnCourt);
+        if (player.getTeam() == null){
+            player.setTeam(this);
+        }
     }
 
     public void setCurrentOnCourt(onCourt curr){
@@ -99,6 +99,7 @@ public class Team {
         if (!this.checkOnCourt(curr)){
             this.onCourts.add(curr);
         }
+        this.currOnCrtPlayers = this.currentOnCourt.getPlayers();
     }
 
     public onCourt getCurrentOnCourt(){
@@ -112,6 +113,20 @@ public class Team {
             }
         }
         return false;
+    }
+
+    public void subOut(Player player){
+        this.currOnCrtPlayers.remove(player);
+        if (currOnCrtPlayers.size() == 5){
+            this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
+        }
+    }
+
+    public void subIn(Player player){
+        this.currOnCrtPlayers.add(player);
+        if (currOnCrtPlayers.size() == 5){
+            this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
+        }
     }
 
 }
