@@ -182,11 +182,11 @@ public class Player {
      */
     public void substitution(String subType, int subTime){
         if (subType.equals("out")){
-            this.team.subOut(this);
+            this.team.subOut(this, subTime);
             int duration = subTime - this.currentPlayTimeInSeconds;
             this.totalPlayTime = this.totalPlayTime + duration;
         } else if(subType.equals("in")){
-            this.team.subIn(this);
+            this.team.subIn(this, subTime);
             this.currentPlayTimeInSeconds = subTime;
         }
     }

@@ -115,17 +115,25 @@ public class Team {
         return false;
     }
 
-    public void subOut(Player player){
+    public void subOut(Player player, int subTime){
+        if (currOnCrtPlayers.size() == 5){
+            this.currentOnCourt.addDuration(subTime - this.currentOnCourt.getCurrentTimeInSeconds());
+        }
         this.currOnCrtPlayers.remove(player);
         if (currOnCrtPlayers.size() == 5){
             this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
+            this.currentOnCourt.setCurrentTimeInSeconds(subTime);
         }
     }
 
-    public void subIn(Player player){
+    public void subIn(Player player, int subTime){
+        if (currOnCrtPlayers.size() == 5){
+            this.currentOnCourt.addDuration(subTime - this.currentOnCourt.getCurrentTimeInSeconds());
+        }
         this.currOnCrtPlayers.add(player);
         if (currOnCrtPlayers.size() == 5){
             this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
+            this.currentOnCourt.setCurrentTimeInSeconds(subTime);
         }
     }
 

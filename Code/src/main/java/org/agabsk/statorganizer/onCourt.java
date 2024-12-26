@@ -93,4 +93,16 @@ public class onCourt {
         return playerList;
     }
 
+    public void setCurrentTimeInSeconds(int time){
+        this.currentTimeInSeconds = time;
+    }
+
+    public int getCurrentTimeInSeconds(){
+        return this.currentTimeInSeconds;
+    }
+
+    public void addDuration(int duration){
+        this.totalPlayTime = this.totalPlayTime + duration;
+    }
+
 }
