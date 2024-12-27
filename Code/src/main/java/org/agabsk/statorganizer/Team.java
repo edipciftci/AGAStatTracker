@@ -9,6 +9,7 @@ public class Team {
     private final ArrayList<onCourt> onCourts;
     private onCourt currentOnCourt;
     private ArrayList<Player> currOnCrtPlayers;
+    private Team currentOpponent;
 
     /**
      * Constructor to initialize team with name.
@@ -121,9 +122,6 @@ public class Team {
         }
         this.currOnCrtPlayers.remove(player);
         if (currOnCrtPlayers.size() == 5){
-            // if (this.currentOnCourt.getTotalPlayTime() == 0){
-            //     this.onCourts.remove(currentOnCourt);
-            // }
             this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
             this.currentOnCourt.setCurrentTimeInSeconds(subTime);
         }
@@ -135,9 +133,6 @@ public class Team {
         }
         this.currOnCrtPlayers.add(player);
         if (currOnCrtPlayers.size() == 5){
-            // if (this.currentOnCourt.getTotalPlayTime() == 0){
-            //     this.onCourts.remove(currentOnCourt);
-            // }
             this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
             this.currentOnCourt.setCurrentTimeInSeconds(subTime);
         }
@@ -145,6 +140,14 @@ public class Team {
 
     public ArrayList<onCourt> getOnCourts(){
         return this.onCourts;
+    }
+
+    public void setOpponent(Team Opponent){
+        this.currentOpponent = Opponent;
+    }
+
+    public Team getCurrentOpponent(){
+        return this.currentOpponent;
     }
 
 }

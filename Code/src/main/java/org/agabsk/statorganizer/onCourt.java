@@ -16,6 +16,10 @@ public class onCourt {
         this.currentTimeInSeconds = 0;
     }
 
+    public void setTeam(Team team){
+        this.team = team;
+    }
+
     public Team getTeam(){
         return this.team;
     }
@@ -47,16 +51,28 @@ public class onCourt {
         onCourtStats.put("Fouls", 0.00);
         onCourtStats.put("Fouls-Drawn", 0.00);
         onCourtStats.put("RebTotal", 0.00);
+        onCourtStats.put("+/-", 0.00);
         return onCourtStats;
     }
 
-    private void updateStat(Player player, String statType, Double diff){
+    public void updatePlusMinus(int diff){
+        for (Player player : this.getPlayers()) {
+            player.updatePlusMinus(diff);
+            this.updateStat(player, "+/-", Double.valueOf(diff));
+        }
+    }
+
+    public void updateStat(Player player, String statType, Double diff){
         Map<String, Double> onCourtStats = this.players.get(player);
+        if (onCourtStats == null){
+            System.out.println("Here");
+            return;
+        }
         Double current = onCourtStats.get(statType);
         onCourtStats.put(statType, current + diff);
     }
 
-    private void updatePercentage(Player player, String shotType){
+    public void updatePercentage(Player player, String shotType){
         String attempString, madeString, percentageString;
         attempString = shotType.concat("-Attempted");
         madeString = shotType.concat("-Made");
@@ -71,6 +87,11 @@ public class onCourt {
         if ("true".equals(success)){
             this.updateStat(player, "2pt-Made", 1.00);
             this.updateStat(player, "Points", 2.00);
+            this.updatePlusMinus(2);
+            if (this.team == null){
+                System.out.println("Here");
+            }
+            this.team.getCurrentOpponent().getCurrentOnCourt().updatePlusMinus(-2);
         }
         this.updateStat(player, "2pt-Attempted", 1.00);
         this.updatePercentage(player, "2pt");
@@ -80,6 +101,11 @@ public class onCourt {
         if ("true".equals(success)){
             this.updateStat(player, "3pt-Made", 1.00);
             this.updateStat(player, "Points", 3.00);
+            this.updatePlusMinus(3);
+            if (this.team == null){
+                System.out.println("Here");
+            }
+            this.team.getCurrentOpponent().getCurrentOnCourt().updatePlusMinus(-3);
         }
         this.updateStat(player, "3pt-Attempted", 1.00);
         this.updatePercentage(player, "3pt");
@@ -89,9 +115,31 @@ public class onCourt {
         if ("true".equals(success)){
             this.updateStat(player, "FT-Made", 1.00);
             this.updateStat(player, "Points", 1.00);
+            this.updatePlusMinus(1);
+            if (this.team == null){
+                System.out.println("Here");
+            }
+            this.team.getCurrentOpponent().getCurrentOnCourt().updatePlusMinus(-1);
         }
         this.updateStat(player, "FT-Attempted", 1.00);
         this.updatePercentage(player, "FT");
+    }
+
+    public void rebound(Player player, String rebType){
+        if ("offensive".equals(rebType)){
+            this.updateStat(player, "OffReb", 1.00);
+        } else {
+            this.updateStat(player, "DefReb", 1.00);
+        }
+        this.updateStat(player, "RebTotal", 1.00);
+    }
+
+    public void foul(Player player, String foulType){
+        if ("drawn".equals(foulType)){
+            this.updateStat(player, "Fouls-Drawn", 1.00);
+        } else{
+            this.updateStat(player, "Fouls", 1.00);
+        }
     }
 
     public boolean checkByPlayers(ArrayList<Player> currentCourt){

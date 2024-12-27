@@ -78,6 +78,7 @@ public class Game {
                 this.homeTeam.addPlayer(player);
             }
             player.addGame(this);
+            player.setTeam(homeTeam);
         }
     }
 
@@ -92,6 +93,7 @@ public class Game {
                 this.awayTeam.addPlayer(player);
             }
             player.addGame(this);
+            player.setTeam(awayTeam);
         }
     }
 

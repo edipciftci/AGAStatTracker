@@ -65,6 +65,7 @@ public class Player {
         this.playerStats.put("Fouls", 0);
         this.playerStats.put("Fouls-Drawn", 0);
         this.playerStats.put("RebTotal", 0);
+        this.playerStats.put("+/-", 0);
     }
 
     /**
@@ -121,7 +122,7 @@ public class Player {
         if ("true".equals(success)) {
             this.playerStats.put("3pt-Made", this.playerStats.get("3pt-Made") + 1);
             this.playerStats.put("Points", this.playerStats.get("Points") + 3);
-        }
+            }
         playerStats.put("3pt-Attempted", playerStats.get("3pt-Attempted") + 1);
         updatePercentage("3pt-Made", "3pt-Attempted", "3pt-Percentage");
         this.team.getCurrentOnCourt().threePTAttempt(this, success);
@@ -165,6 +166,7 @@ public class Player {
             this.playerStats.put("DefReb", this.playerStats.get("DefReb") + 1);
         }
         this.playerStats.put("RebTotal", this.playerStats.get("RebTotal") + 1);
+        this.team.getCurrentOnCourt().rebound(this, rebType);
     }
 
     /**
@@ -177,6 +179,7 @@ public class Player {
         } else{
             this.playerStats.put("Fouls", this.playerStats.get("Fouls") + 1);
         }
+        this.team.getCurrentOnCourt().foul(this, foulType);
     }
 
     /**
@@ -226,12 +229,24 @@ public class Player {
             case "2pt" -> this.twoPTAttempt(event.getSuccess());
             case "3pt" -> this.threePTAttempt(event.getSuccess());
             case "freeThrow" -> this.FTAttempt(event.getSuccess());
-            case "assist" -> this.playerStats.put("Assists", this.playerStats.get("Assists")+1);
+            case "assist" -> {
+                this.playerStats.put("Assists", this.playerStats.get("Assists")+1);
+                this.team.getCurrentOnCourt().updateStat(this, "Assists", 1.00);
+            }
             case "rebound" -> this.rebound(event.getEventType().split("-")[1]);
-            case "steal" -> this.playerStats.put("Steal", this.playerStats.get("Steal")+1);
-            case "turnover" -> this.playerStats.put("TO", this.playerStats.get("TO")+1);
+            case "steal" -> {
+                this.playerStats.put("Steal", this.playerStats.get("Steal")+1);
+                this.team.getCurrentOnCourt().updateStat(this, "Steal", 1.00);
+            }
+            case "turnover" -> {
+                this.playerStats.put("TO", this.playerStats.get("TO")+1);
+                this.team.getCurrentOnCourt().updateStat(this, "TO", 1.00);
+            }
             case "foul" -> this.foul(event.getEventType().split("-")[1]);
-            case "block" -> this.playerStats.put("Block", this.playerStats.get("Block")+1);
+            case "block" -> {
+                this.playerStats.put("Block", this.playerStats.get("Block")+1);
+                this.team.getCurrentOnCourt().updateStat(this, "Block", 1.00);
+            }
             case "substitution" -> this.substitution(event.getEventType().split("-")[1], event.getClockInSeconds());
         
             default -> System.out.println(event.getEventType());
@@ -312,6 +327,10 @@ public class Player {
             newCourt.addPlayer(player);
         }
         return newCourt;
+    }
+
+    public void updatePlusMinus(int diff){
+        this.playerStats.put("+/-", this.playerStats.get("+/-") + diff);
     }
 
 }

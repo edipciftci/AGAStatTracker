@@ -315,8 +315,14 @@ public class Code {
             }
 
             game.setGameName();
+
+            game.getHomeTeam().setOpponent(game.getAwayTeam());
+            game.getAwayTeam().setOpponent(game.getHomeTeam());
+
             game.getHomeTeam().setCurrentOnCourt(startingFives[0]);
+            game.getHomeTeam().getCurrentOnCourt().setTeam(game.getHomeTeam());
             game.getAwayTeam().setCurrentOnCourt(startingFives[1]);
+            game.getAwayTeam().getCurrentOnCourt().setTeam(game.getAwayTeam());
 
             game.getHomeTeam().getCurrentOnCourt().setCurrentTimeInSeconds(0);
             game.getAwayTeam().getCurrentOnCourt().setCurrentTimeInSeconds(0);
@@ -345,9 +351,11 @@ public class Code {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
             // Sort and filter onCourt objects based on total play time (ascending order)
             List<onCourt> sortedOnCourts = onCourts.stream()
-                    .filter(five -> five.getTotalPlayTime() > 0) // Optional: only include those with play time > 0
-                    .sorted(Comparator.comparingInt(onCourt::getTotalPlayTime).reversed()) // Sort by total play time
-                    .collect(Collectors.toList());
+                .filter(five -> five.getTotalPlayTime() > 0) // Only include those with play time > 0
+                .sorted(Comparator.comparingDouble(five -> 
+                    ((onCourt) five).getTotalStats().get("Points") / ((onCourt) five).getTotalPlayTime()).reversed()) // Sort by points per second in descending order
+                .collect(Collectors.toList());
+
 
             int courtIndex = 1;
 
@@ -400,7 +408,7 @@ public class Code {
                 // Write total stats header
                 writer.write("----------------------------------------\n");
                 statTypes.stream()
-                    .map(statType -> statType.contains("-") ? statType.substring(0, 7) : statType)
+                    .map(statType -> statType.contains("-") ? (statType.length()>7 ? statType.substring(0, 7) : statType) : statType)
                     .forEach(statHeader -> {
                         try {
                             writer.write(String.format("%-9s", statHeader));
