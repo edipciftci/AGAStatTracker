@@ -121,6 +121,9 @@ public class Team {
         }
         this.currOnCrtPlayers.remove(player);
         if (currOnCrtPlayers.size() == 5){
+            // if (this.currentOnCourt.getTotalPlayTime() == 0){
+            //     this.onCourts.remove(currentOnCourt);
+            // }
             this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
             this.currentOnCourt.setCurrentTimeInSeconds(subTime);
         }
@@ -132,9 +135,16 @@ public class Team {
         }
         this.currOnCrtPlayers.add(player);
         if (currOnCrtPlayers.size() == 5){
+            // if (this.currentOnCourt.getTotalPlayTime() == 0){
+            //     this.onCourts.remove(currentOnCourt);
+            // }
             this.setCurrentOnCourt(currOnCrtPlayers.get(0).checkOnCourt(currOnCrtPlayers));
             this.currentOnCourt.setCurrentTimeInSeconds(subTime);
         }
+    }
+
+    public ArrayList<onCourt> getOnCourts(){
+        return this.onCourts;
     }
 
 }

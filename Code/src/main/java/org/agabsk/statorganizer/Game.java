@@ -1,6 +1,7 @@
 package org.agabsk.statorganizer;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +14,7 @@ public class Game {
     private ArrayList<Player> awayPlayers = new ArrayList<>();
     private ArrayList<Player> players = new ArrayList<>();
     private Team homeTeam, awayTeam;
+    private int totalDuration = 0;
     
     /**
      * Constructor to initialize game with players.
@@ -50,6 +52,7 @@ public class Game {
         for (int i = 0; i < events.size(); i++) {
             this.newEvent((JsonObject) events.get(i), qtr+1);
         }
+        this.totalDuration = (qtr+1) * 600;
     }
 
     /**
@@ -166,6 +169,30 @@ public class Game {
      */
     public String getGameName(){
         return this.gameName;
+    }
+
+    public void gameOver(){
+        for (Player player : this.homeTeam.getCurrentOnCourt().getPlayers()){
+            player.substitution("out", this.totalDuration);
+        }
+        for (Player player : this.awayTeam.getCurrentOnCourt().getPlayers()){
+            player.substitution("out", this.totalDuration);
+        }
+        Iterator<onCourt> iteratorHome = this.homeTeam.getOnCourts().iterator();
+        while (iteratorHome.hasNext()) {
+            onCourt curr = iteratorHome.next();
+            if (curr.getTotalPlayTime() < 2) {
+                iteratorHome.remove(); // Safe removal using iterator
+            }
+        }
+
+        Iterator<onCourt> iteratorAway = this.awayTeam.getOnCourts().iterator();
+        while (iteratorAway.hasNext()) {
+            onCourt curr = iteratorAway.next();
+            if (curr.getTotalPlayTime() < 2) {
+                iteratorAway.remove(); // Safe removal using iterator
+            }
+        }
     }
 
 }

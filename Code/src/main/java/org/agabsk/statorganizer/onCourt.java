@@ -76,6 +76,24 @@ public class onCourt {
         this.updatePercentage(player, "2pt");
     }
 
+    public void threePTAttempt(Player player, String success){
+        if ("true".equals(success)){
+            this.updateStat(player, "3pt-Made", 1.00);
+            this.updateStat(player, "Points", 3.00);
+        }
+        this.updateStat(player, "3pt-Attempted", 1.00);
+        this.updatePercentage(player, "3pt");
+    }
+
+    public void FTAttempt(Player player, String success){
+        if ("true".equals(success)){
+            this.updateStat(player, "FT-Made", 1.00);
+            this.updateStat(player, "Points", 1.00);
+        }
+        this.updateStat(player, "FT-Attempted", 1.00);
+        this.updatePercentage(player, "FT");
+    }
+
     public boolean checkByPlayers(ArrayList<Player> currentCourt){
         for (Player player : currentCourt){
             if (!this.players.containsKey(player)){
@@ -105,4 +123,59 @@ public class onCourt {
         this.totalPlayTime = this.totalPlayTime + duration;
     }
 
+    public Map<String, Double> getTotalStats(){
+        Double statVal, current;
+        Map<String, Double> onCourtStats = new HashMap<>();
+        onCourtStats.put("2pt-Attempted", 0.00);
+        onCourtStats.put("2pt-Made", 0.00);
+        onCourtStats.put("2pt-Percentage", 0.00);
+        onCourtStats.put("3pt-Attempted", 0.00);
+        onCourtStats.put("3pt-Made", 0.00);
+        onCourtStats.put("3pt-Percentage", 0.00);
+        onCourtStats.put("FT-Attempted", 0.00);
+        onCourtStats.put("FT-Made", 0.00);
+        onCourtStats.put("FT-Percentage", 0.00);
+        onCourtStats.put("Points", 0.00);
+        onCourtStats.put("Assists", 0.00);
+        onCourtStats.put("OffReb", 0.00);
+        onCourtStats.put("DefReb", 0.00);
+        onCourtStats.put("Steal", 0.00);
+        onCourtStats.put("TO", 0.00);
+        onCourtStats.put("Block", 0.00);
+        onCourtStats.put("Fouls", 0.00);
+        onCourtStats.put("Fouls-Drawn", 0.00);
+        onCourtStats.put("RebTotal", 0.00);
+        for (Map<String, Double> playerStats: players.values()){
+            for (String statType : onCourtStats.keySet()) {
+                if (statType.contains("Percentage")){
+                    continue;
+                }
+                statVal = playerStats.get(statType);
+                current = onCourtStats.get(statType);
+                onCourtStats.put(statType, statVal+current);
+            }
+        }
+        for (String statType : onCourtStats.keySet()) {
+            if (statType.contains("Percentage")){
+                String shotType = statType.substring(0, statType.length()-11);
+                String attempString, madeString, percentageString;
+                attempString = shotType.concat("-Attempted");
+                madeString = shotType.concat("-Made");
+                percentageString = shotType.concat("-Percentage");
+                Double attempts = onCourtStats.get(attempString);
+                Double makes = onCourtStats.get(madeString);
+                Double percentage = attempts > 0 ? ((makes/attempts) * 100) : 0;
+                onCourtStats.put(percentageString, percentage);
+            }
+        }
+        return onCourtStats;
+    }
+
+    public int getTotalPlayTime(){
+        return this.totalPlayTime;
+    }
+
+    public Map<Player, Map<String, Double>> getPlayersStruct(){
+        return this.players;
+    }
 }

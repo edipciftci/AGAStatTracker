@@ -110,6 +110,7 @@ public class Player {
         }
         this.playerStats.put("2pt-Attempted", this.playerStats.get("2pt-Attempted") + 1);
         updatePercentage("2pt-Made", "2pt-Attempted", "2pt-Percentage");
+        this.team.getCurrentOnCourt().twoPTAttempt(this, success);
     }
 
     /**
@@ -123,6 +124,7 @@ public class Player {
         }
         playerStats.put("3pt-Attempted", playerStats.get("3pt-Attempted") + 1);
         updatePercentage("3pt-Made", "3pt-Attempted", "3pt-Percentage");
+        this.team.getCurrentOnCourt().threePTAttempt(this, success);
     }
 
     /**
@@ -136,6 +138,7 @@ public class Player {
         }
         this.playerStats.put("FT-Attempted", this.playerStats.get("FT-Attempted") + 1);
         updatePercentage("FT-Made", "FT-Attempted", "FT-Percentage");
+        this.team.getCurrentOnCourt().FTAttempt(this, success);
     }
 
     /**
