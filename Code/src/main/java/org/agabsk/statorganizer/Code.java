@@ -1,11 +1,20 @@
 package org.agabsk.statorganizer;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -31,9 +40,7 @@ public class Code {
         for (Team team : teamPool) {
             if (team.getTeamName().equals("ANKARA GENÇ AKADEMİ")){
                 ankAkademi = team;
-                for (Player player : ankAkademi.getRoster()) {
-                    System.out.println(player.getPlayerName().concat(" averages ").concat(String.valueOf(player.getAverageStat("Points"))).concat(" points per game."));
-                }
+                writeOnCourtStatsToFile(ankAkademi.getOnCourts(), "onCourtStats");
                 break;
             }
         }
@@ -311,6 +318,9 @@ public class Code {
             game.getHomeTeam().setCurrentOnCourt(startingFives[0]);
             game.getAwayTeam().setCurrentOnCourt(startingFives[1]);
 
+            game.getHomeTeam().getCurrentOnCourt().setCurrentTimeInSeconds(0);
+            game.getAwayTeam().getCurrentOnCourt().setCurrentTimeInSeconds(0);
+
             // Set events for each quarter
             String[] qtrKeys = {"1", "2", "3", "4", "11", "12", "13", "14"};
             JsonObject pbp = gameJson.getAsJsonObject("pbp");
@@ -321,11 +331,112 @@ public class Code {
                 game.setQtr(pbp.getAsJsonObject(key).getAsJsonArray("events"), Integer.parseInt(key));
             }
 
+            game.gameOver();
+
             return game;
 
         } catch (JsonSyntaxException | IOException | NumberFormatException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void writeOnCourtStatsToFile(List<onCourt> onCourts, String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            // Sort and filter onCourt objects based on total play time (ascending order)
+            List<onCourt> sortedOnCourts = onCourts.stream()
+                    .filter(five -> five.getTotalPlayTime() > 0) // Optional: only include those with play time > 0
+                    .sorted(Comparator.comparingInt(onCourt::getTotalPlayTime).reversed()) // Sort by total play time
+                    .collect(Collectors.toList());
+
+            int courtIndex = 1;
+
+            for (onCourt five : sortedOnCourts) {
+                writer.write("----------------------------------------\n");
+                writer.write("On-Court " + courtIndex + "\n");
+                writer.write("----------------------------------------\n");
+
+                // Get player stats structure
+                Map<Player, Map<String, Double>> playersStruct = five.getPlayersStruct();
+
+                // Write player names as column headers
+                writer.write(String.format("%-25s", "Stat Type"));
+                playersStruct.keySet().stream()
+                    .map(Player::getPlayerName)
+                    .forEach(playerName -> {
+                        try {
+                            writer.write(String.format("%-25s", playerName));
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                writer.write("\n");
+
+                // Collect all unique stat types
+                Set<String> statTypes = playersStruct.values().stream()
+                    .flatMap(stats -> stats.keySet().stream())
+                    .sorted()
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                // Write stats row by row
+                statTypes.forEach(statType -> {
+                    try {
+                        writer.write(String.format("%-25s", statType));
+                        playersStruct.values().stream()
+                            .map(stats -> stats.getOrDefault(statType, 0.0))
+                            .forEach(statValue -> {
+                                try {
+                                    writer.write(String.format("%-25.2f", statValue));
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(e);
+                                }
+                            });
+                        writer.write("\n");
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                });
+
+                // Write total stats header
+                writer.write("----------------------------------------\n");
+                statTypes.stream()
+                    .map(statType -> statType.contains("-") ? statType.substring(0, 7) : statType)
+                    .forEach(statHeader -> {
+                        try {
+                            writer.write(String.format("%-9s", statHeader));
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                writer.write("\n");
+
+                // Write total stats values
+                Map<String, Double> onCourtStats = five.getTotalStats();
+                statTypes.stream()
+                    .map(statType -> onCourtStats.getOrDefault(statType, 0.0))
+                    .forEach(totalValue -> {
+                        try {
+                            writer.write(String.format("%-9.2f", totalValue));
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                writer.write("\n");
+
+                writer.write("Total Play Time:\t");
+                writer.write(String.format("%-6s", five.getTotalPlayTime()));
+                writer.write("s\n");
+
+                writer.write("----------------------------------------\n");
+                writer.write("************************\n");
+
+                courtIndex++;
+            }
+
+            System.out.println("Stats successfully written to " + fileName);
+
+        } catch (IOException e) {
+            System.err.println("Error writing to file: " + e.getMessage());
         }
     }
 
